@@ -1,0 +1,24 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+    commands:
+      - echo "Install phase"
+      - pip install --upgrade pip
+      - pip3 install --upgrade aws-sam-cli
+     
+  build:
+    commands:
+      - echo "Building package"
+      - sam package --template-file template.yaml --output-template-file packaged.yaml --s3-bucket $BUILD_OUTPUT_BUCKET
+
+  post_build:
+    commands:
+      - echo "post build phase deploy..."
+      - sam deploy --template-file packaged.yaml --stack-name codepipelinestack2 --capabilities CAPABILITY_IAM 
+
+artifacts:
+  files:
+    - packaged.yaml
+  discard-paths: yes
